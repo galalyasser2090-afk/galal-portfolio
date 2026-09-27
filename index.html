@@ -5,4 +5,51 @@
 <a href="https://wa.me/201038747311" target="_blank" rel="noopener" style="color:#fff;text-decoration:none;background:#171f38;border:1px solid #343e63;padding:11px 18px;border-radius:12px">💬 واتساب</a>
 </div>
 <div style="margin-top:18px">© Eng. Galal Yasser — All Rights Reserved</div>
-</footer><script>const designs=JSON.parse(localStorage.getItem('galal_designs')||'[]');const grid=document.getElementById('grid');if(!designs.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1">لم تتم إضافة تصميمات بعد.</div>'}else designs.forEach(d=>{grid.innerHTML+=`<article class="card"><img src="${d.image}" alt="${d.title||'Design'}"><h3>${d.title||'Design'}</h3></article>`});</script></body></html>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://nsppbvbvdxuquqgkioxf.supabase.co";
+const SUPABASE_KEY = "ضع_مفتاح_Supabase_هنا";
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const grid = document.getElementById("grid");
+
+async function loadDesigns() {
+  grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">جاري تحميل التصميمات...</div>';
+
+  const { data, error } = await db
+    .from("designs")
+    .select("id,title,image_url")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">حدث خطأ في تحميل التصميمات.</div>';
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">لم تتم إضافة تصميمات بعد.</div>';
+    return;
+  }
+
+  grid.innerHTML = "";
+
+  data.forEach(d => {
+    grid.innerHTML += `
+      <article class="card">
+        <img src="${d.image_url}" alt="${d.title || "Design"}">
+        <h3>${d.title || "Design"}</h3>
+      </article>
+    `;
+  });
+}
+
+loadDesigns();
+</script>
+
+</body></html>
